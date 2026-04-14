@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health & Climate Vulnerability Tool</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; display: flex; height: 100vh; background-color: #f4f7f6; }
+        
+        /* Sidebar styling matching your wireframe concept */
+        #sidebar { width: 350px; background: white; padding: 25px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); z-index: 1000; overflow-y: auto; }
+        h1 { font-size: 20px; color: #2c3e50; }
+        p.subtitle { font-size: 13px; color: #7f8c8d; line-height: 1.5; }
+        
+        .control-group { margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px; }
+        label { font-weight: bold; font-size: 14px; display: block; margin-bottom: 8px; color: #34495e; }
+        
+        button { display: block; width: 100%; padding: 10px; margin-bottom: 10px; background: #ecf0f1; border: 1px solid #bdc3c7; border-radius: 5px; cursor: pointer; text-align: left; font-size: 14px; transition: 0.2s; }
+        button:hover { background: #e0e6e8; }
+        button.active { background: #3498db; color: white; border-color: #2980b9; font-weight: bold; }
+
+        /* The Map container */
+        #map { flex-grow: 1; height: 100%; }
+
+        /* Custom Legend styling */
+        .legend { background: white; padding: 10px; line-height: 1.5; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2); font-size: 12px; }
+        .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <div style="text-align: center; margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px;">
+            <a href="explain.html" style="font-size: 15px; color: white; text-decoration: none; font-weight: 600; display: inline-block;">📖 Learn How It Works</a>
+        </div>
+        
+        <h1>🇳🇱 Climate Exposure Health Tool</h1>
+        <p class="subtitle">Predicting neighborhood-level health vulnerability to extreme heat up to 2075. Developed in partnership with the Ministry of Health.</p>
+
+        <div class="control-group">
+            <label><strong>📊 What's Being Displayed?</strong></label>
+            <p style="font-size:12px; color:#555; line-height:1.4; margin:0;">
+                <strong>Health Vulnerability Score (0-100):</strong> Higher = greater risk. Combines seven factors:
+                <ul style="margin:5px 0; padding-left:20px; font-size:11px;">
+                    <li><strong>Heat (+4.17)</strong>: PET temperature impact</li>
+                    <li><strong>Elderly (+3.44)</strong>: % aged 65+</li>
+                    <li><strong>Income (+2.98)</strong>: % low-income residents</li>
+                    <li><strong>Children (+2.89)</strong>: % aged 0-14</li>
+                    <li><strong>Old Buildings (+0.66)</strong>: % built before 2010</li>
+                    <li><strong>Stress (+0.66)</strong>: High stress index</li>
+                    <li><strong>Housing (+0.61)</strong>: % rental units</li>
+                </ul>
+            </p>
+        </div>
+
+        <div class="control-group">
+            <label>1. Select Climate Scenario (Year)</label>
+            <button class="scenario-btn active" data-layer="risk_2025_baseline">2025: Current Baseline</button>
+            <button class="scenario-btn" data-layer="risk_2050_baseline">2050: +1.5°C Warming</button>
+            <button class="scenario-btn" data-layer="risk_2075_baseline">2075: +3.0°C Warming</button>
+        </div>
+
+        <div class="control-group">
+            <label>2. Simulate Policy Interventions</label>
+            <button class="scenario-btn" data-layer="risk_2050_greening" style="border-left: 5px solid #2ecc71;">
+                🌿 2050 + Urban Greening Policy<br>
+                <span style="font-size:11px; font-weight:normal;">Reduces heat by 15% through urban greening (parks, trees)</span>
+            </button>
+        </div>
+
+        <div class="control-group" style="background:#f0f8ff; padding:10px; border-radius:5px; margin-top:15px;">
+            <label style="color:#0066cc;">📐 The Math Behind the Model</label>
+            <p style="font-size:11px; color:#333; line-height:1.5; margin:0;">
+                <strong>Linear Regression Model:</strong> Trained on 11,554 neighborhoods<br>
+                <code style="background:#eee; padding:2px 4px; font-size:10px;">Vulnerability = -1047.90 + 4.46×Heat + 3.25×Income% + 1.43×Elderly% + 1.40×Rental%</code>
+                <br><br>
+                <strong>Scoring:</strong> Raw scores normalized to 0-100 scale for visualization<br>
+                <strong>Data:</strong> CBS (demographic), KlimaatAtlas (heat), GGD (health)
+            </p>
+            <p id="debug-info" style="font-size:10px; color:#999; margin-top:5px; padding-top:5px; border-top:1px solid #ccc;"></p>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <script>
+        // 1. Initialize the map centered on the Netherlands
+        var map = L.map('map').setView([52.1326, 5.2913], 7);
+
+        // Add a clean, light base map
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+        }).addTo(map);
+
+        var geojsonLayer;
+        var geojsonData;
+        var currentScenario = 'risk_2025_baseline'; // Default view
+
+        // 2. Define the color scale for Health Vulnerability (0 to 100)
+        function getColor(score) {
+            if (!score || isNaN(score)) return '#cccccc'; // Gray for missing data
+            return score > 80 ? '#bd0026' : // Critical (Dark Red)
+                   score > 60 ? '#f03b20' : // High (Red)
+                   score > 40 ? '#fd8d3c' : // Moderate (Orange)
+                   score > 20 ? '#fecc5c' : // Low (Yellow)
+                              '#ffffb2';  // Safe (Light Yellow)
+        }
+
+        function style(feature) {
+            var score = feature.properties[currentScenario];
+            return {
+                fillColor: getColor(score),
+                weight: 1,
+                opacity: 1,
+                color: 'white',
+                fillOpacity: 0.8
+            };
+        }
+
+        // NEW: Add interactive popups
+        function onEachFeature(feature, layer) {
+            var name = feature.properties.buurtnaam || feature.properties.buurtcode || "Neighborhood"; 
+            
+            layer.bindPopup(function() {
+                var currentScore = feature.properties[currentScenario];
+                var displayScore = currentScore !== undefined && !isNaN(currentScore) ? Math.round(currentScore * 10) / 10 : "N/A";
+                return "<div style='font-family: sans-serif;'>" +
+                       "<b style='font-size: 14px;'>" + name + "</b><br><hr style='margin: 5px 0;'>" + 
+                       "Health Risk Score: <b style='color:" + getColor(displayScore) + "; font-size: 16px;'>" + displayScore + "</b> / 100" +
+                       "</div>";
+            });
+            
+            // Highlight on hover
+            layer.on('mouseover', function() { this.setStyle({weight: 2}); });
+            layer.on('mouseout', function() { this.setStyle({weight: 1}); });
+        }
+
+        // 3. Load the data and draw it on the map
+        fetch('map_scenarios.geojson')
+            .then(response => response.json())
+            .then(data => {
+                geojsonData = data;
+                console.log('✅ GeoJSON loaded! Features:', data.features.length);
+                console.log('Sample feature properties:', data.features[0]?.properties);
+                
+                geojsonLayer = L.geoJson(data, { 
+                    style: style,
+                    onEachFeature: onEachFeature
+                }).addTo(map);
+                
+                // Update debug info
+                var validCount = data.features.filter(f => f.properties[currentScenario]).length;
+                document.getElementById('debug-info').innerHTML = 
+                    '✅ Loaded ' + validCount + ' neighborhoods | Model: 11,554 trained';
+            })
+            .catch(error => {
+                console.error('❌ Error loading GeoJSON:', error);
+                document.getElementById('debug-info').innerHTML = '❌ Error loading map data';
+            });
+
+        // 4. Handle Button Clicks (FIXED)
+        document.querySelectorAll('.scenario-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('active'));
+                // Add to clicked button
+                this.classList.add('active');
+
+                // Update the current scenario
+                var newScenario = this.getAttribute('data-layer');
+                console.log('🔄 Switching to:', newScenario);
+                currentScenario = newScenario;
+
+                // CRITICAL: Remove old layer and re-render with new style
+                if (geojsonLayer) {
+                    map.removeLayer(geojsonLayer);
+                }
+                
+                // Redraw the entire layer with new colors
+                if (geojsonData) {
+                    geojsonLayer = L.geoJson(geojsonData, { 
+                        style: style,
+                        onEachFeature: onEachFeature
+                    }).addTo(map);
+                    console.log('✅ Map redrawn with', currentScenario);
+                }
+            });
+        });
+
+        // 5. Add a Legend
+        var legend = L.control({position: 'bottomright'});
+        legend.onAdd = function (map) {
+            var div = L.DomUtil.create('div', 'info legend'),
+                grades = [0, 20, 40, 60, 80],
+                labels = ['<strong>Health Risk Score</strong><br>'];
+            for (var i = 0; i < grades.length; i++) {
+                div.innerHTML += labels.join('') +
+                    '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+                    grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+                labels = []; // clear to avoid duplicating title
+            }
+            return div;
+        };
+        legend.addTo(map);
+        
+        console.log('🚀 Dashboard initialized!');
+    </script>
+</body>
+</html>
