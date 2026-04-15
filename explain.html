@@ -308,7 +308,7 @@
 </head>
 <body>
     <header>
-        <h1>🌡️ How Heat Vulnerability Works</h1>
+        <h1> How Heat Vulnerability Works</h1>
         <p>Understanding the science behind neighborhood heat risk in the Netherlands</p>
     </header>
     
@@ -390,19 +390,18 @@
             
             <h3>The Formula (If You're Curious)</h3>
             <div class="formula">
-Vulnerability = -1268.37 + 
+Vulnerability = -1332.3467 + 
                 4.17 × Temperature +
                 3.44 × Elderly% +
                 2.98 × Low-Income% +
                 2.89 × Children% +
                 0.66 × OldBuildings% +
                 0.66 × StressLevel% +
-                0.61 × Rental%
             </div>
             
             <h3>What This Means</h3>
             <p>
-                We expanded the original 4-factor model to include 7 key factors. The model now explains 72% of the variance in health vulnerability 
+                We expanded the original 4-factor model to include 6 key factors. The model now explains 72% of the variance in health vulnerability 
                 (R² = 0.7220)—a significant improvement. Notably, the elderly population emerged as more important than low income, and we added three 
                 critical new factors: children (young populations are vulnerable too), old buildings (poor insulation/cooling), and stress (mental health 
                 directly impacts heat resilience).
@@ -418,7 +417,6 @@ Vulnerability = -1268.37 +
                     <li>8% children (0-14) → +2.89 × 8 = +23.1</li>
                     <li>78% buildings pre-2010 → +0.66 × 78 = +51.5</li>
                     <li>310 stress index (raw scale) → +0.66 × 310 = +204.6</li>
-                    <li>65% rental housing → +0.61 × 65 = +39.7</li>
                 </ul>
                 <p style="margin: 15px 0 0 0;">
                     <strong>Calculation:</strong> -1268.37 + 183.5 + 61.9 + 65.6 + 23.1 + 51.5 + 204.6 + 39.7 = -638.2 (raw score)
