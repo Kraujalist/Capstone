@@ -896,8 +896,7 @@
             <h2>The Model</h2>
         </div>
 
-        <p>We use <strong>Multiple Linear Regression</strong>—trained on real neighborhoods to find which factors best predict health vulnerability. The approach is intentionally transparent: every factor's contribution is visible and auditable.</p>
-        <p>The refined 6-factor model explains the majority of variance in health vulnerability (trained on 11,554 neighborhoods).</p>
+        <p>The methodology utilizes a Multiple Linear Regression model trained on a comprehensive dataset of 11,554 Dutch neighborhoods, merging perceived temperature data from KlimaatAtlas, demographic statistics from the CBS, and self-reported health outcomes from GGD surveys. Starting from a baseline intercept of −1332.35, the model calculates a health vulnerability score where perceived temperature (PET) is the primary driver, adding 4.32 points for every degree Celsius increase. Social and infrastructure factors significantly amplify this risk: every percentage point increase in the elderly (65+) population adds 4.05 points, low-income residents add 3.40 points, and the percentage of children (0–14) adds 2.99 points. Additionally, the model accounts for psychological and physical environments, adding 0.93 points for every percentage of the population reporting high stress and 0.61 points for every percentage of buildings constructed before 2010. These raw scores are normalized to a 0–100 scale, allowing for longitudinal projections where a +1.5°C shift by 2050 increases average vulnerability by approximately 8 points, while aggressive urban greening policies are projected to provide a significant offset of 10 to 12 points.</p>
 
         <h3>The Equation</h3>
         <div class="formula-block">
