@@ -3,992 +3,1191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>How It Works - Climate Health Tool</title>
+    <title>How It Works — Heat Vulnerability Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --ink: #1a1410;
+            --paper: #faf8f5;
+            --warm-mid: #e8e2d9;
+            --accent: #c94a2a;
+            --accent-dark: #8b2a12;
+            --accent-pale: #f5e8e3;
+            --gold: #b8860b;
+            --green: #2d6a4f;
+            --green-pale: #e8f4ee;
+            --text-mid: #4a3f35;
+            --text-light: #7a6e64;
+            --border: #d4ccc2;
+            --serif: 'DM Serif Display', Georgia, serif;
+            --sans: 'DM Sans', sans-serif;
+            --mono: 'DM Mono', monospace;
         }
-        
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            font-family: var(--sans);
+            background: var(--paper);
+            color: var(--ink);
             line-height: 1.7;
-            color: #2c3e50;
-            background: #f8fafb;
+            overflow-x: hidden;
         }
-        
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 60px 20px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+
+        /* ── HERO ── */
+        .hero {
+            position: relative;
+            background: var(--ink);
+            color: var(--paper);
+            padding: 100px 40px 80px;
+            overflow: hidden;
         }
-        
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 700;
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse 80% 60% at 80% 40%, rgba(201,74,42,0.22) 0%, transparent 65%),
+                radial-gradient(ellipse 50% 80% at 10% 90%, rgba(184,134,11,0.12) 0%, transparent 60%);
         }
-        
-        header p {
-            font-size: 1.1em;
-            opacity: 0.95;
-            max-width: 600px;
+
+        .hero-inner {
+            position: relative;
+            max-width: 860px;
             margin: 0 auto;
         }
-        
-        nav {
-            background: white;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+
+        .hero-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--accent);
+            border: 1px solid rgba(201,74,42,0.4);
+            padding: 5px 14px;
+            border-radius: 2px;
+            margin-bottom: 32px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease 0.1s forwards;
+        }
+
+        .hero-label::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%,100% { opacity:1; } 50% { opacity:0.3; }
+        }
+
+        .hero h1 {
+            font-family: var(--serif);
+            font-size: clamp(2.8rem, 6vw, 5rem);
+            line-height: 1.08;
+            margin-bottom: 28px;
+            opacity: 0;
+            animation: fadeUp 0.7s ease 0.2s forwards;
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: rgba(250,248,245,0.72);
+            max-width: 520px;
+            line-height: 1.75;
+            opacity: 0;
+            animation: fadeUp 0.7s ease 0.35s forwards;
+        }
+
+        .hero-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 52px;
+            opacity: 0;
+            animation: fadeUp 0.7s ease 0.5s forwards;
+        }
+
+        .hero-nav a {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(250,248,245,0.6);
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 1px solid rgba(250,248,245,0.15);
+            border-radius: 2px;
+            transition: all 0.25s;
+        }
+
+        .hero-nav a:hover {
+            color: var(--paper);
+            border-color: rgba(250,248,245,0.5);
+            background: rgba(250,248,245,0.06);
+        }
+
+        .hero-nav a.primary {
+            color: var(--accent);
+            border-color: rgba(201,74,42,0.5);
+        }
+        .hero-nav a.primary:hover {
+            background: rgba(201,74,42,0.12);
+            border-color: var(--accent);
+        }
+
+        /* ── STICKY NAV ── */
+        .sticky-nav {
             position: sticky;
             top: 0;
             z-index: 100;
+            background: rgba(250,248,245,0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
         }
-        
-        nav a {
-            display: inline-block;
-            margin: 0 10px;
-            padding: 8px 16px;
-            background: #667eea;
-            color: white;
-            text-decoration: none;
-            border-radius: 20px;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-        }
-        
-        nav a:hover {
-            background: #764ba2;
-            transform: translateY(-2px);
-        }
-        
-        .container {
-            max-width: 900px;
+
+        .sticky-nav-inner {
+            max-width: 860px;
             margin: 0 auto;
-            padding: 40px 20px;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            overflow-x: auto;
         }
-        
-        h2 {
-            font-size: 2em;
-            margin: 50px 0 20px 0;
-            color: #667eea;
-            font-weight: 700;
+
+        .sticky-nav a {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 166px 18px;
+            padding: 16px 18px;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .sticky-nav a:hover {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* ── MAIN LAYOUT ── */
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 40px 100px;
+        }
+
+        /* ── SECTION ── */
+        .section {
+            padding: 80px 0 0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .section-num {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--accent);
+            letter-spacing: 0.1em;
+            flex-shrink: 0;
+        }
+
+        .section h2 {
+            font-family: var(--serif);
+            font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+            color: var(--ink);
+            line-height: 1.15;
+        }
+
+        .section h3 {
+            font-family: var(--sans);
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-mid);
+            margin: 36px 0 14px;
+        }
+
+        .section p {
+            color: var(--text-mid);
+            margin-bottom: 16px;
+            font-size: 1.02rem;
+        }
+
+        /* ── INTRO CARD ── */
+        .intro-card {
+            background: var(--ink);
+            color: var(--paper);
+            padding: 44px 48px;
+            border-radius: 4px;
             position: relative;
-            padding-bottom: 15px;
+            overflow: hidden;
         }
-        
-        h2::after {
+
+        .intro-card::after {
             content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(201,74,42,0.25) 0%, transparent 70%);
+        }
+
+        .intro-card p {
+            color: rgba(250,248,245,0.8);
+            font-size: 1.08rem;
+            line-height: 1.8;
+            margin-bottom: 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .intro-card p:last-child { margin-bottom: 0; }
+
+        .intro-card strong { color: var(--paper); }
+
+        .intro-card .accent-text { color: var(--accent); }
+
+        /* ── DATA TABLE ── */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 28px 0;
+        }
+
+        .data-table thead tr {
+            border-bottom: 2px solid var(--ink);
+        }
+
+        .data-table th {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-light);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .data-table td {
+            padding: 18px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.96rem;
+            color: var(--text-mid);
+            vertical-align: top;
+        }
+
+        .data-table tr:last-child td { border-bottom: none; }
+
+        .data-table td strong { color: var(--ink); }
+
+        .data-table tbody tr {
+            transition: background 0.15s;
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--accent-pale);
+        }
+
+        .tag {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            border-radius: 2px;
+            background: var(--warm-mid);
+            color: var(--text-mid);
+        }
+
+        .tag-accent {
+            background: var(--accent-pale);
+            color: var(--accent-dark);
+        }
+
+        /* ── FORMULA BLOCK ── */
+        .formula-block {
+            background: var(--ink);
+            color: var(--paper);
+            padding: 36px 40px;
+            border-radius: 4px;
+            font-family: var(--mono);
+            font-size: 0.88rem;
+            line-height: 2;
+            overflow-x: auto;
+            margin: 24px 0;
+            position: relative;
+        }
+
+        .formula-block::before {
+            content: 'MODEL EQUATION';
+            display: block;
+            font-size: 0.65rem;
+            letter-spacing: 0.18em;
+            color: rgba(250,248,245,0.35);
+            margin-bottom: 16px;
+        }
+
+        .formula-block .coef-pos { color: #f4a261; }
+        .formula-block .var-name { color: #90e0ef; }
+        .formula-block .const { color: rgba(250,248,245,0.5); }
+
+        /* ── EXAMPLE BOX ── */
+        .example-box {
+            border: 1.5px solid var(--border);
+            border-radius: 4px;
+            padding: 32px 36px;
+            margin: 24px 0;
+            background: white;
+        }
+
+        .example-box .ex-label {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+
+        .example-box ul {
+            list-style: none;
+            margin: 0 0 20px;
+        }
+
+        .example-box ul li {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border);
+            font-size: 0.94rem;
+            color: var(--text-mid);
+        }
+
+        .example-box ul li:last-child { border-bottom: none; }
+
+        .example-box ul li .val {
+            font-family: var(--mono);
+            font-size: 0.88rem;
+            color: var(--accent);
+        }
+
+        .example-result {
+            background: var(--ink);
+            color: var(--paper);
+            padding: 18px 24px;
+            border-radius: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .example-result .label {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            color: rgba(250,248,245,0.5);
+        }
+
+        .example-result .score {
+            font-family: var(--serif);
+            font-size: 2rem;
+            color: #f4a261;
+        }
+
+        /* ── FACTORS GRID ── */
+        .factors-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 28px 0;
+        }
+
+        .factor-card {
+            background: var(--paper);
+            padding: 28px 30px;
+            position: relative;
+            transition: background 0.2s;
+        }
+
+        .factor-card:hover { background: white; }
+
+        .factor-rank {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            color: var(--text-light);
+            margin-bottom: 12px;
+        }
+
+        .factor-name {
+            font-family: var(--serif);
+            font-size: 1.35rem;
+            color: var(--ink);
+            margin-bottom: 6px;
+            line-height: 1.2;
+        }
+
+        .factor-coef {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-bottom: 14px;
+        }
+
+        .factor-desc {
+            font-size: 0.9rem;
+            color: var(--text-mid);
+            line-height: 1.65;
+        }
+
+        .factor-bar {
             position: absolute;
             bottom: 0;
             left: 0;
-            width: 60px;
-            height: 4px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 2px;
+            height: 3px;
+            background: var(--accent);
+            transition: width 1s ease;
         }
-        
-        h3 {
-            font-size: 1.4em;
-            margin: 25px 0 15px 0;
-            color: #34495e;
-            font-weight: 600;
-        }
-        
-        .intro-section {
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            margin: 30px 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            border-left: 5px solid #667eea;
-        }
-        
-        .intro-section p {
-            font-size: 1.1em;
-            line-height: 1.8;
-            margin-bottom: 15px;
-        }
-        
-        .intro-section strong {
-            color: #667eea;
-        }
-        
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-        
-        .feature-card {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            border-top: 4px solid #667eea;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-        
-        .feature-card h4 {
-            font-size: 1.2em;
-            margin-bottom: 10px;
-            color: #667eea;
-        }
-        
-        .feature-card p {
-            font-size: 0.95em;
-            line-height: 1.6;
-            color: #555;
-        }
-        
-        .formula {
-            background: linear-gradient(135deg, #667eea15, #764ba215);
-            padding: 25px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-            font-family: 'Courier New', monospace;
-            overflow-x: auto;
-            margin: 20px 0;
-            font-size: 0.95em;
-            line-height: 1.8;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 25px 0;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        }
-        
-        table th {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 15px;
-            font-weight: 600;
-            text-align: left;
-        }
-        
-        table td {
-            padding: 15px;
-            border-bottom: 1px solid #ecf0f1;
-        }
-        
-        table tr:hover {
-            background: #f8fafb;
-        }
-        
-        table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .color-swatch {
+
+        /* Dynamic width updates based on new coefficients */
+        .factor-card:nth-child(1) .factor-bar { width: 100%; } /* Temp: 4.32 */
+        .factor-card:nth-child(2) .factor-bar { width: 94%; }  /* Elderly: 4.05 */
+        .factor-card:nth-child(3) .factor-bar { width: 79%; }  /* Income: 3.40 */
+        .factor-card:nth-child(4) .factor-bar { width: 69%; }  /* Children: 2.99 */
+        .factor-card:nth-child(5) .factor-bar { width: 22%; background: var(--text-light); } /* Stress: 0.93 */
+        .factor-card:nth-child(6) .factor-bar { width: 14%; background: var(--text-light); } /* Buildings: 0.61 */
+
+        /* NEW badge */
+        .badge-new {
             display: inline-block;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            margin-right: 10px;
-            border: 2px solid rgba(0,0,0,0.1);
+            font-family: var(--mono);
+            font-size: 0.62rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            background: var(--green);
+            color: white;
+            padding: 2px 7px;
+            border-radius: 2px;
+            margin-left: 8px;
             vertical-align: middle;
         }
-        
-        .highlight-box {
-            background: linear-gradient(135deg, #ffd89b15, #ffd89b25);
-            border-left: 5px solid #ffc107;
-            padding: 25px;
-            border-radius: 10px;
-            margin: 20px 0;
+
+        /* ── RISK TABLE ── */
+        .risk-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border);
         }
-        
-        .highlight-box strong {
-            color: #ff9800;
+
+        .risk-row:last-child { border-bottom: none; }
+
+        .risk-swatch {
+            width: 18px;
+            height: 48px;
+            border-radius: 2px;
+            flex-shrink: 0;
         }
-        
-        .insight-list {
+
+        .risk-score {
+            font-family: var(--mono);
+            font-size: 0.9rem;
+            color: var(--text-light);
+            width: 60px;
+            flex-shrink: 0;
+        }
+
+        .risk-level {
+            font-family: var(--serif);
+            font-size: 1.2rem;
+            color: var(--ink);
+            width: 100px;
+            flex-shrink: 0;
+        }
+
+        .risk-desc {
+            font-size: 0.92rem;
+            color: var(--text-mid);
+            line-height: 1.55;
+        }
+
+        /* ── SCENARIO CARDS ── */
+        .scenarios-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 28px 0;
+        }
+
+        .scenario-card {
+            border: 1.5px solid var(--border);
+            border-radius: 4px;
+            padding: 28px;
+            background: white;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .scenario-card:hover {
+            border-color: var(--ink);
+            transform: translateY(-2px);
+        }
+
+        .scenario-card.highlight {
+            border-color: var(--green);
+            background: var(--green-pale);
+        }
+
+        .scenario-year {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .scenario-title {
+            font-family: var(--serif);
+            font-size: 1.4rem;
+            color: var(--ink);
+            margin-bottom: 14px;
+        }
+
+        .scenario-card.highlight .scenario-title { color: var(--green); }
+
+        .scenario-delta {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 2px;
+            background: var(--warm-mid);
+            color: var(--text-mid);
+            margin-bottom: 14px;
+        }
+
+        .scenario-card.highlight .scenario-delta {
+            background: rgba(45,106,79,0.15);
+            color: var(--green);
+        }
+
+        .scenario-desc {
+            font-size: 0.91rem;
+            color: var(--text-mid);
+            line-height: 1.65;
+        }
+
+        /* ── CAVEATS ── */
+        .caveat-list {
             list-style: none;
             margin: 20px 0;
         }
-        
-        .insight-list li {
-            padding: 15px;
-            margin: 10px 0;
-            background: white;
-            border-left: 4px solid #667eea;
-            border-radius: 5px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+
+        .caveat-list li {
+            display: flex;
+            gap: 16px;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+            color: var(--text-mid);
+            line-height: 1.65;
         }
-        
-        .insight-list strong {
-            color: #667eea;
+
+        .caveat-list li:last-child { border-bottom: none; }
+
+        .caveat-num {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--accent);
+            flex-shrink: 0;
+            padding-top: 3px;
         }
-        
-        .scenario-card {
-            background: white;
-            padding: 25px;
-            margin: 15px 0;
-            border-radius: 10px;
-            border-left: 5px solid #667eea;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+
+        .caveat-list li strong { color: var(--ink); }
+
+        /* ── TAKEAWAYS ── */
+        .takeaway-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 28px 0;
         }
-        
-        .scenario-card h4 {
-            color: #667eea;
-            margin-bottom: 10px;
+
+        .takeaway-card {
+            background: var(--paper);
+            padding: 28px 24px;
         }
-        
-        .code-block {
-            background: #2c3e50;
-            color: #ecf0f1;
-            padding: 25px;
-            border-radius: 10px;
-            font-family: 'Courier New', monospace;
-            overflow-x: auto;
-            font-size: 0.9em;
+
+        .takeaway-icon {
+            font-size: 1.5rem;
+            margin-bottom: 14px;
+        }
+
+        .takeaway-card h4 {
+            font-family: var(--serif);
+            font-size: 1.1rem;
+            color: var(--ink);
+            margin-bottom: 8px;
+            line-height: 1.25;
+        }
+
+        .takeaway-card p {
+            font-size: 0.88rem;
+            color: var(--text-mid);
             line-height: 1.6;
-            margin: 20px 0;
+            margin: 0;
         }
-        
-        footer {
-            background: #2c3e50;
-            color: white;
-            text-align: center;
-            padding: 40px 20px;
-            margin-top: 60px;
+
+        /* ── STEPS ── */
+        .steps-list {
+            list-style: none;
+            counter-reset: step;
+            margin: 24px 0;
         }
-        
-        footer a {
-            color: #667eea;
-            text-decoration: none;
+
+        .steps-list li {
+            counter-increment: step;
+            display: flex;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.96rem;
+            color: var(--text-mid);
         }
-        
-        footer a:hover {
-            text-decoration: underline;
+
+        .steps-list li:last-child { border-bottom: none; }
+
+        .steps-list li::before {
+            content: counter(step, decimal-leading-zero);
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--accent);
+            flex-shrink: 0;
+            padding-top: 2px;
+            min-width: 28px;
         }
-        
-        .back-button {
+
+        .steps-list li strong { color: var(--ink); }
+
+        /* ── FOOTER CTA ── */
+        .footer-cta {
+            background: var(--ink);
+            color: var(--paper);
+            padding: 64px 48px;
+            border-radius: 4px;
+            margin-top: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .footer-cta h2 {
+            font-family: var(--serif);
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            color: var(--paper);
+            line-height: 1.2;
+            max-width: 400px;
+        }
+
+        .footer-cta h2 em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .cta-btn {
             display: inline-block;
-            margin-bottom: 20px;
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ink);
+            background: var(--paper);
+            padding: 14px 28px;
+            border-radius: 2px;
             text-decoration: none;
-            border-radius: 20px;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
-        
-        .back-button:hover {
-            background: #764ba2;
-            transform: translateX(-5px);
+
+        .cta-btn:hover {
+            background: var(--accent);
+            color: white;
         }
-        
-        .emoji {
-            margin-right: 8px;
+
+        /* ── SITE FOOTER ── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 40px;
+            text-align: center;
         }
-        
-        .section-meta {
-            color: #999;
-            font-size: 0.9em;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #ecf0f1;
+
+        footer p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        footer strong { color: var(--ink); }
+
+        /* ── DIVIDER ── */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 60px 0 0;
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 680px) {
+            .hero { padding: 70px 24px 60px; }
+            .container { padding: 0 24px 80px; }
+            .sticky-nav { padding: 0 24px; }
+            .factors-grid { grid-template-columns: 1fr; }
+            .scenarios-grid { grid-template-columns: 1fr; }
+            .takeaway-grid { grid-template-columns: 1fr 1fr; }
+            .footer-cta { padding: 40px 32px; }
+            .intro-card { padding: 32px 28px; }
+            .formula-block { padding: 28px 24px; font-size: 0.8rem; }
+        }
+
+        @media (max-width: 480px) {
+            .takeaway-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1> How Heat Vulnerability Works</h1>
-        <p>Understanding the science behind neighborhood heat risk in the Netherlands</p>
-    </header>
-    
-    <nav>
-        <a href="index.html">← Back to Dashboard</a>
-        <a href="#bigpicture">The Big Picture</a>
+
+<header class="hero">
+    <div class="hero-inner">
+        <div class="hero-label">Heat Vulnerability Tool · Methodology</div>
+        <h1>How <em>heat risk</em><br>is measured</h1>
+        <p>The science behind predicting which Dutch neighborhoods face the greatest danger during heat waves—and why the answer isn't just temperature.</p>
+        <nav class="hero-nav">
+            <a href="index.html" class="primary">← Dashboard</a>
+            <a href="#bigpicture">The Big Picture</a>
+            <a href="#model">The Model</a>
+            <a href="#factors">Factors</a>
+            <a href="#scenarios">Scenarios</a>
+            <a href="#limitations">Limitations</a>
+        </nav>
+    </div>
+</header>
+
+<nav class="sticky-nav">
+    <div class="sticky-nav-inner">
+        <a href="#bigpicture">Big Picture</a>
+        <a href="#data">Data Sources</a>
         <a href="#model">The Model</a>
-        <a href="#factors">The Factors</a>
+        <a href="#factors">Factors</a>
         <a href="#colors">Risk Levels</a>
-    </nav>
-    
-    <div class="container">
-        <!-- BIG PICTURE -->
-        <section id="bigpicture">
+        <a href="#scenarios">Scenarios</a>
+        <a href="#insights">Insights</a>
+        <a href="#limitations">Caveats</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <section id="bigpicture" class="section">
+        <div class="section-header">
+            <span class="section-num">01</span>
             <h2>The Big Picture</h2>
-            
-            <div class="intro-section">
-                <p>
-                    Heat waves have become more extreme. But here's what most climate apps don't tell you: <strong>the danger isn't evenly distributed</strong>.
-                </p>
-                <p>
-                    Your neighbor might be fine during a heat wave while another neighborhood just blocks away faces a health crisis. Why? Because heat vulnerability depends on <strong>who lives there</strong> and <strong>what condition their homes are in</strong>—not just how hot it gets.
-                </p>
-                <p>
-                    This tool brings together three types of data to predict which neighborhoods are most at risk: climate conditions, demographic information, and actual health outcomes. The result? A clear picture of where Dutch communities need help.
-                </p>
-            </div>
-        </section>
+        </div>
 
-        <!-- THE DATA -->
-        <section id="data">
-            <h2>Where the Data Comes From</h2>
-            
-            <p>We combined three major Dutch government datasets:</p>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Dataset</th>
-                        <th>Source</th>
-                        <th>Tells Us</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Climate Data</strong></td>
-                        <td>KlimaatAtlas 2024</td>
-                        <td>How hot it actually feels (perceived temp) in each neighborhood</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Who Lives Where</strong></td>
-                        <td>CBS (Statistics Netherlands)</td>
-                        <td>Age, income levels, housing types, and population sizes</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Real Health Data</strong></td>
-                        <td>GGD (Municipal Health Services)</td>
-                        <td>How people actually report their health and stress levels</td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <p class="section-meta">Analysis includes 11,554 neighborhoods across the Netherlands with complete data</p>
-        </section>
+        <div class="intro-card">
+            <p>Heat waves are intensifying. But most climate tools miss the real story: <strong>danger isn't evenly distributed</strong>.</p>
+            <p>Your neighbor might be fine while a neighborhood blocks away faces a health crisis. The difference isn't just how hot it gets—it's <span class="accent-text">who lives there</span> and <span class="accent-text">what condition their homes are in</span>.</p>
+            <p>This tool merges three types of Dutch government data—climate conditions, demographics, and real health outcomes—to reveal where communities are most at risk. Not a rough estimate: a neighborhood-level portrait of vulnerability across all 11,554 neighborhoods in the Netherlands.</p>
+        </div>
+    </section>
 
-        <!-- THE MODEL -->
-        <section id="model">
-            <h2>How We Built the Model</h2>
-            
-            <div class="intro-section">
-                <p>
-                    We used <strong>Linear Regression</strong>—think of it as finding the strongest patterns in the data. 
-                    We trained it on real neighborhoods, watching which factors predict high health vulnerability best.
-                </p>
-                <p>
-                    The beauty of this approach? <strong>It's transparent</strong>. You can see exactly how much each factor matters.
-                </p>
-            </div>
-            
-            <h3>The Formula (If You're Curious)</h3>
-            <div class="formula">
-Vulnerability = -1332.3467 + 
-                4.17 × Temperature +
-                3.44 × Elderly% +
-                2.98 × Low-Income% +
-                2.89 × Children% +
-                0.66 × OldBuildings% +
-                0.66 × StressLevel% +
-            </div>
-            
-            <h3>What This Means</h3>
-            <p>
-                We expanded the original 4-factor model to include 6 key factors. The model now explains 72% of the variance in health vulnerability 
-                (R² = 0.7220)—a significant improvement. Notably, the elderly population emerged as more important than low income, and we added three 
-                critical new factors: children (young populations are vulnerable too), old buildings (poor insulation/cooling), and stress (mental health 
-                directly impacts heat resilience).
-            </p>
-            
-            <h3>A Real Example</h3>
-            <div class="highlight-box">
-                <strong>An Amsterdam neighborhood (7-factor model):</strong>
-                <ul style="margin: 15px 0 0 0; padding-left: 25px;">
-                    <li>Summer temperature feels like 44°C → +4.17 × 44 = +183.5</li>
-                    <li>18% seniors (65+) → +3.44 × 18 = +61.9</li>
-                    <li>22% low-income → +2.98 × 22 = +65.6</li>
-                    <li>8% children (0-14) → +2.89 × 8 = +23.1</li>
-                    <li>78% buildings pre-2010 → +0.66 × 78 = +51.5</li>
-                    <li>310 stress index (raw scale) → +0.66 × 310 = +204.6</li>
-                </ul>
-                <p style="margin: 15px 0 0 0;">
-                    <strong>Calculation:</strong> -1268.37 + 183.5 + 61.9 + 65.6 + 23.1 + 51.5 + 204.6 + 39.7 = -638.2 (raw score)
-                </p>
-                <p style="margin: 5px 0 0 0;">
-                    <strong>Normalized Result:</strong> ~42/100 (moderate risk)—higher than the 4-factor model because we now account for building age and stress impacts.
-                </p>
-            </div>
-        </section>
+    <hr class="divider">
 
-        <!-- THE FACTORS -->
-        <section id="factors">
-            <h2>📈 What Drives Heat Vulnerability?</h2>
-            
-            <p>
-                The enhanced model identified seven key factors. Here they are, ranked by impact:
-            </p>
-            
-            <div class="feature-grid">
-                <div class="feature-card" style="border-top-color: #bd0026;">
-                    <h4>1️⃣ Temperature (+4.17)</h4>
-                    <p>
-                        <strong>The biggest factor.</strong> Higher perceived temperature = higher risk. It's what you feel, accounting for wind, humidity, and sun radiation—not just the thermometer reading. Ranges from 35°C to 50°C across the Netherlands.
-                    </p>
-                </div>
-                
-                <div class="feature-card" style="border-top-color: #f03b20;">
-                    <h4>2️⃣ Elderly Population (+3.44)</h4>
-                    <p>
-                        <strong>The age factor.</strong> Seniors are more physically vulnerable during heat waves. They take medications that affect heat tolerance, have more health conditions, and often live alone without support. This emerged as MORE important than income in the expanded model.
-                    </p>
-                </div>
-                
-                <div class="feature-card" style="border-top-color: #fd8d3c;">
-                    <h4>3️⃣ Low Income (+2.98)</h4>
-                    <p>
-                        <strong>The inequality factor.</strong> Lower-income residents can't afford air conditioning, often live in older buildings, and have less access to cooling centers and health resources. Every 10% more low-income residents = vulnerability jump of ~30 points.
-                    </p>
-                </div>
+    <section id="data" class="section">
+        <div class="section-header">
+            <span class="section-num">02</span>
+            <h2>Data Sources</h2>
+        </div>
 
-                <div class="feature-card" style="border-top-color: #fecc5c;">
-                    <h4>4️⃣ Children Population (+2.89)</h4>
-                    <p>
-                        <strong>The young vulnerability factor (NEW).</strong> Young children (0-14) are heat-vulnerable populations too. They have immature thermoregulation, can't self-care during heat stress, and depend on caregivers. This was a critical gap in the original model.
-                    </p>
-                </div>
-                
-                <div class="feature-card" style="border-top-color: #ffeda0;">
-                    <h4>5️⃣ Old Buildings (+0.66)</h4>
-                    <p>
-                        <strong>The building quality factor (NEW).</strong> Buildings constructed before 2010 typically have poor insulation, no air conditioning, and modern cooling infrastructure. Neighborhoods with more old buildings = higher heat risk.
-                    </p>
-                </div>
+        <p style="color:var(--text-mid); margin-bottom: 24px;">Three major Dutch government datasets, merged at neighborhood level:</p>
 
-                <div class="feature-card" style="border-top-color: #a1d99b;">
-                    <h4>6️⃣ Stress Levels (+0.66)</h4>
-                    <p>
-                        <strong>The mental health factor (NEW).</strong> High psychological stress directly reduces heat resilience. People under stress have weaker immune responses to heat, higher risk of heat stroke, and poor decision-making during heat waves. Actual stress data from health surveys.
-                    </p>
-                </div>
-                
-                <div class="feature-card" style="border-top-color: #fee5d9;">
-                    <h4>7️⃣ Rental Housing (+0.61)</h4>
-                    <p>
-                        <strong>The housing stability factor.</strong> Renters often occupy older, poorly insulated buildings and can't independently invest in cooling solutions. It signals neighborhood conditions and residential instability.
-                    </p>
-                </div>
-            </div>
-        </section>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Dataset</th>
+                    <th>Source</th>
+                    <th>What it tells us</th>
+                    <th>Coverage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Climate Data</strong></td>
+                    <td><span class="tag">KlimaatAtlas 2024</span></td>
+                    <td>Perceived temperature (°C) accounting for wind, humidity, and solar radiation</td>
+                    <td>14,668 neighborhoods</td>
+                </tr>
+                <tr>
+                    <td><strong>Demographics</strong></td>
+                    <td><span class="tag">CBS 2024</span></td>
+                    <td>Age distribution, income levels, housing types, population</td>
+                    <td>14,668 neighborhoods</td>
+                </tr>
+                <tr>
+                    <td><strong>Health Indicators</strong></td>
+                    <td><span class="tag">GGD 2024</span></td>
+                    <td>Self-reported health, stress levels, heat coping ability from surveys</td>
+                    <td>11,554 neighborhoods*</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size:0.85rem; color:var(--text-light);">* Only neighborhoods with complete health data included in model training.</p>
+    </section>
 
-        <!-- COLORS -->
-        <section id="colors">
-            <h2>Understanding the Colors</h2>
-            
-            <p>The map uses a simple 5-color scale to show risk levels:</p>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Score</th>
-                        <th>What It Means</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><span class="color-swatch" style="background:#ffffb2;"></span> Light Yellow</td>
-                        <td>0-20</td>
-                        <td>Safe. The neighborhood has good conditions and resilient residents.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="color-swatch" style="background:#fecc5c;"></span> Yellow</td>
-                        <td>20-40</td>
-                        <td>Low Risk. Some vulnerabilities exist but overall manageable.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="color-swatch" style="background:#fd8d3c;"></span> Orange</td>
-                        <td>40-60</td>
-                        <td>Moderate Risk. Significant factors present. Local action recommended.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="color-swatch" style="background:#f03b20;"></span> Red</td>
-                        <td>60-80</td>
-                        <td>High Risk. Urgent support needed. Vulnerable populations at serious risk.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="color-swatch" style="background:#bd0026;"></span> Dark Red</td>
-                        <td>80-100</td>
-                        <td>Critical Risk. Immediate action required. Emergency planning needed.</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
+    <hr class="divider">
 
-        <!-- SCENARIOS -->
-        <section id="scenarios">
-            <h2>🌍 Future Scenarios</h2>
-            
-            <p>
-                The dashboard shows what happens under different climate and policy futures. All based on KNMI (Royal Netherlands Meteorological Institute) climate projections:
-            </p>
-            
-            <div class="scenario-card">
-                <h4>📊 2025: Today's Reality</h4>
-                <p>Current conditions. What we're experiencing right now. This is your baseline for comparison.</p>
-            </div>
-            
-            <div class="scenario-card">
-                <h4>+1.5°C by 2050</h4>
-                <p>
-                    If we follow the Paris Agreement path (aggressive climate action). Still challenging, but heat isn't running away entirely.
-                    Average vulnerability jumps ~8 points.
-                </p>
-            </div>
-            
-            <div class="scenario-card">
-                <h4>+3.0°C by 2075</h4>
-                <p>
-                    If current emissions continue. Significantly warmer. Average vulnerability jumps ~16 points. 
-                    Red zones expand, pushing more neighborhoods into crisis levels.
-                </p>
-            </div>
-            
-            <div class="scenario-card" style="border-left-color: #2ecc71;">
-                <h4>🌿 2050 + Holistic Policy</h4>
-                <p>
-                    What if we invest in multiple interventions? Urban greening (parks, trees, roof gardens) PLUS community 
-                    mental health programs to reduce stress. This combined policy reduces vulnerability by ~10-12 points 
-                    compared to 2050 baseline—equivalent to delaying warming by 2-3 years. Proof that comprehensive action works 
-                    better than single-factor solutions.
-                </p>
-            </div>
-        </section>
+    <section id="model" class="section">
+        <div class="section-header">
+            <span class="section-num">03</span>
+            <h2>The Model</h2>
+        </div>
 
-        <!-- KEY INSIGHTS -->
-        <section id="insights">
-            <h2> Big Takeaways</h2>
-            
-            <ul class="insight-list">
-                <li>
-                    <strong>Temperature dominates</strong>, but poverty and housing quality matter enormously. 
-                    An air-conditioned luxury apartment in a hot area beats a poor neighborhood in cooler climate.
-                </li>
-                <li>
-                    <strong>Inequality amplifies risk.</strong> The poorest neighborhoods get hit hardest by both heat and they have fewest resources to cope.
-                </li>
-                <li>
-                    <strong>Policy works.</strong> Urban greening can reduce vulnerability as much as 2-3 years of delayed warming. 
-                    Cities have real power to protect their residents.
-                </li>
-                <li>
-                    <strong>It's getting worse before it gets better.</strong> Even under best-case climate scenarios, 
-                    heat vulnerability increases significantly by 2050.
-                </li>
-                <li>
-                    <strong>Red zones matter most.</strong> A neighborhood in the 80s is in crisis. 
-                    These need immediate emergency planning, cooling centers, health monitoring.
-                </li>
+        <p>We use <strong>Multiple Linear Regression</strong>—trained on real neighborhoods to find which factors best predict health vulnerability. The approach is intentionally transparent: every factor's contribution is visible and auditable.</p>
+        <p>The refined 6-factor model explains the majority of variance in health vulnerability (trained on 11,554 neighborhoods).</p>
+
+        <h3>The Equation</h3>
+        <div class="formula-block">
+<span class="const">Vulnerability = −1332.347</span>
+               + <span class="coef-pos">4.32</span> × <span class="var-name">Temperature</span>
+               + <span class="coef-pos">4.05</span> × <span class="var-name">Elderly %</span>
+               + <span class="coef-pos">3.40</span> × <span class="var-name">Low-Income %</span>
+               + <span class="coef-pos">2.99</span> × <span class="var-name">Children %</span>
+               + <span class="coef-pos">0.93</span> × <span class="var-name">Stress Level %</span>
+               + <span class="coef-pos">0.61</span> × <span class="var-name">Old Buildings %</span>
+        </div>
+
+        <p style="font-size:0.9rem; color:var(--text-light);">Raw scores are normalized to a 0–100 scale: 0 = lowest risk, 100 = highest risk.</p>
+
+        <h3>A Worked Example</h3>
+        <div class="example-box">
+            <div class="ex-label">Amsterdam Neighborhood · Illustrative Calculation</div>
+            <ul>
+                <li><span>Summer temperature (PET)</span><span class="val">44°C → +190.2</span></li>
+                <li><span>Seniors aged 65+</span><span class="val">18% → +72.9</span></li>
+                <li><span>Low-income residents</span><span class="val">22% → +74.8</span></li>
+                <li><span>Children 0–14</span><span class="val">8% → +23.9</span></li>
+                <li><span>Stress index (raw)</span><span class="val">310 → +288.3</span></li>
+                <li><span>Buildings pre-2010</span><span class="val">78% → +47.6</span></li>
             </ul>
-        </section>
+            <div class="example-result">
+                <div>
+                    <div class="label">Normalized Score</div>
+                    <div style="font-size:0.85rem; color:rgba(250,248,245,0.5); margin-top:2px;">Refined 6-factor estimate</div>
+                </div>
+                <div class="score">44 / 100</div>
+            </div>
+        </div>
+    </section>
 
-        <!-- HOW TO USE -->
-        <section id="howto">
+    <hr class="divider">
+
+    <section id="factors" class="section">
+        <div class="section-header">
+            <span class="section-num">04</span>
+            <h2>What Drives Vulnerability</h2>
+        </div>
+
+        <p>Six core factors, ranked by their model coefficient (impact per unit increase):</p>
+
+        <div class="factors-grid">
+            <div class="factor-card">
+                <div class="factor-rank">01 · Highest impact</div>
+                <div class="factor-name">Temperature</div>
+                <div class="factor-coef">+4.32 per °C</div>
+                <div class="factor-desc">Perceived temperature (PET) accounts for wind, humidity, and solar radiation. It remains the strongest predictor of neighborhood-level heat distress.</div>
+                <div class="factor-bar"></div>
+            </div>
+
+            <div class="factor-card">
+                <div class="factor-rank">02</div>
+                <div class="factor-name">Elderly Population</div>
+                <div class="factor-coef">+4.05 per %</div>
+                <div class="factor-desc">Seniors face reduced thermoregulation and greater social isolation. This factor's impact has significantly increased in the refined model.</div>
+                <div class="factor-bar"></div>
+            </div>
+
+            <div class="factor-card">
+                <div class="factor-rank">03</div>
+                <div class="factor-name">Low Income</div>
+                <div class="factor-coef">+3.40 per %</div>
+                <div class="factor-desc">Financial barriers to air conditioning, energy-efficient housing, and private healthcare. A critical amplifier of physiological heat risk.</div>
+                <div class="factor-bar"></div>
+            </div>
+
+            <div class="factor-card">
+                <div class="factor-rank">04</div>
+                <div class="factor-name">Children</div>
+                <div class="factor-coef">+2.99 per %</div>
+                <div class="factor-desc">Young children (0–14) are highly sensitive to heat due to immature physiological responses and reliance on adult care for hydration/cooling.</div>
+                <div class="factor-bar"></div>
+            </div>
+
+            <div class="factor-card">
+                <div class="factor-rank">05</div>
+                <div class="factor-name">Stress Levels</div>
+                <div class="factor-coef">+0.93 per %</div>
+                <div class="factor-desc">High psychological stress (GGD survey data) correlates with lower resilience and higher reported health complications during extreme heat.</div>
+                <div class="factor-bar"></div>
+            </div>
+
+            <div class="factor-card">
+                <div class="factor-rank">06</div>
+                <div class="factor-name">Old Buildings</div>
+                <div class="factor-coef">+0.61 per %</div>
+                <div class="factor-desc">Structures built before 2010 often suffer from poor thermal mass and lack modern insulation, leading to dangerous indoor heat retention.</div>
+                <div class="factor-bar"></div>
+            </div>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <section id="colors" class="section">
+        <div class="section-header">
+            <span class="section-num">05</span>
+            <h2>Risk Levels</h2>
+        </div>
+
+        <p>Scores are mapped to a five-level colour scale for the map view:</p>
+
+        <div style="margin: 28px 0;">
+            <div class="risk-row">
+                <div class="risk-swatch" style="background:#ffffb2;"></div>
+                <div class="risk-score">0 – 20</div>
+                <div class="risk-level">Safe</div>
+                <div class="risk-desc">Favourable climate and resilient population. No immediate action required.</div>
+            </div>
+            <div class="risk-row">
+                <div class="risk-swatch" style="background:#fecc5c;"></div>
+                <div class="risk-score">20 – 40</div>
+                <div class="risk-level">Low</div>
+                <div class="risk-desc">Some vulnerability factors present but manageable with existing resources.</div>
+            </div>
+            <div class="risk-row">
+                <div class="risk-swatch" style="background:#fd8d3c;"></div>
+                <div class="risk-score">40 – 60</div>
+                <div class="risk-level">Moderate</div>
+                <div class="risk-desc">Significant vulnerability factors present. Local outreach and monitoring recommended.</div>
+            </div>
+            <div class="risk-row">
+                <div class="risk-swatch" style="background:#f03b20;"></div>
+                <div class="risk-score">60 – 80</div>
+                <div class="risk-level">High</div>
+                <div class="risk-desc">Vulnerable populations at serious risk. Urgent support and cooling access needed.</div>
+            </div>
+            <div class="risk-row">
+                <div class="risk-swatch" style="background:#bd0026;"></div>
+                <div class="risk-score">80 – 100</div>
+                <div class="risk-level">Critical</div>
+                <div class="risk-desc">Immediate intervention required. Emergency planning, cooling centres, and health monitoring essential.</div>
+            </div>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <section id="scenarios" class="section">
+        <div class="section-header">
+            <span class="section-num">06</span>
+            <h2>Future Scenarios</h2>
+        </div>
+
+        <p>All projections based on <strong>KNMI</strong> (Royal Netherlands Meteorological Institute) climate scenarios, applied to current neighborhood data:</p>
+
+        <div class="scenarios-grid">
+            <div class="scenario-card">
+                <div class="scenario-year">Baseline</div>
+                <div class="scenario-title">2025 — Today</div>
+                <div class="scenario-delta">+0°C change</div>
+                <div class="scenario-desc">Real 2024 conditions. The starting point for all comparisons. Shows where risk already exists before any additional warming.</div>
+            </div>
+
+            <div class="scenario-card">
+                <div class="scenario-year">Near-term</div>
+                <div class="scenario-title">2050 — +1.5°C</div>
+                <div class="scenario-delta">~+8 pts average vulnerability</div>
+                <div class="scenario-desc">Paris Agreement pathway (aggressive global action). Challenging but manageable. Corresponds to the low-emissions KNMI trajectory.</div>
+            </div>
+
+            <div class="scenario-card">
+                <div class="scenario-year">Long-term</div>
+                <div class="scenario-title">2075 — +3.0°C</div>
+                <div class="scenario-delta">~+16 pts average vulnerability</div>
+                <div class="scenario-desc">Current emissions trajectory with no significant policy shift. Red zones expand substantially; more neighborhoods enter crisis levels.</div>
+            </div>
+
+            <div class="scenario-card highlight">
+                <div class="scenario-year">Policy intervention</div>
+                <div class="scenario-title">2050 + Greening</div>
+                <div class="scenario-delta">−10 to −12 pts vs. 2050</div>
+                <div class="scenario-desc">Urban greening (parks, trees, roof gardens) combined with community mental health programs. Equivalent to delaying ~2–3 years of warming. Proof that local action works.</div>
+            </div>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <section id="insights" class="section">
+        <div class="section-header">
+            <span class="section-num">07</span>
+            <h2>Key Takeaways</h2>
+        </div>
+
+        <div class="takeaway-grid">
+            <div class="takeaway-card">
+                <div class="takeaway-icon">🌡</div>
+                <h4>Temperature dominates, but doesn't determine everything</h4>
+                <p>An air-conditioned apartment in a hot area can beat a poor neighbourhood in a cooler one. Climate is the trigger; social conditions are the amplifier.</p>
+            </div>
+            <div class="takeaway-card">
+                <div class="takeaway-icon">⚖️</div>
+                <h4>Inequality amplifies risk</h4>
+                <p>The poorest neighbourhoods are hit hardest and have the fewest resources to cope. Disparity doesn't just co-exist with heat risk—it multiplies it.</p>
+            </div>
+            <div class="takeaway-card">
+                <div class="takeaway-icon">🌿</div>
+                <h4>Policy genuinely works</h4>
+                <p>Urban greening reduces vulnerability as much as 2–3 years of delayed warming. Cities have real power to protect their residents right now.</p>
+            </div>
+            <div class="takeaway-card">
+                <div class="takeaway-icon">📈</div>
+                <h4>It gets worse before 2050</h4>
+                <p>Even under the most optimistic climate scenario, average heat vulnerability increases significantly by mid-century.</p>
+            </div>
+            <div class="takeaway-card">
+                <div class="takeaway-icon">🔴</div>
+                <h4>Red zones are crises, not warnings</h4>
+                <p>Neighborhoods scoring 80+ need emergency-level planning: cooling centres, health monitoring, proactive outreach—not just awareness.</p>
+            </div>
+            <div class="takeaway-card">
+                <div class="takeaway-icon">🏗</div>
+                <h4>Building age is underrated</h4>
+                <p>Old housing stock quietly traps heat and lacks cooling infrastructure. Renovation programmes may matter as much as green space investment.</p>
+            </div>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <section id="howto" class="section">
+        <div class="section-header">
+            <span class="section-num">08</span>
             <h2>Using the Dashboard</h2>
-            
-            <div class="intro-section">
-                <p><strong>1.</strong> Open the main map view</p>
-                <p><strong>2.</strong> Click the buttons on the left to compare scenarios (2025 vs. 2050 vs. 2075 vs. greening)</p>
-                <p><strong>3.</strong> Click any neighborhood to see its exact score and name</p>
-                <p><strong>4.</strong> Look for red and dark red neighborhoods—these are your priorities</p>
-                <p><strong>5.</strong> Use this data to plan interventions, cooling centers, or outreach programs</p>
-            </div>
-        </section>
+        </div>
 
-        <!-- LIMITATIONS -->
-        <section id="limitations">
+        <ol class="steps-list">
+            <li><strong>Open the main map view</strong> — the dashboard loads with 2025 baseline data already rendered.</li>
+            <li><strong>Select a scenario</strong> using the buttons in the left sidebar to compare 2025, 2050, 2075, and the greening policy.</li>
+            <li><strong>Click any neighbourhood</strong> to see its name, exact risk score (0–100), and colour classification.</li>
+            <li><strong>Focus on red and dark-red areas</strong> — these are your priority zones for intervention planning.</li>
+            <li><strong>Compare 2050 vs. 2050 + Greening</strong> to quantify the potential impact of a specific policy investment.</li>
+            <li><strong>Export or screenshot</strong> specific views to share with local decision-makers or include in reports.</li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <section id="limitations" class="section">
+        <div class="section-header">
+            <span class="section-num">09</span>
             <h2>Important Caveats</h2>
-            
-            <ul class="insight-list">
-                <li>
-                    <strong>Neighborhood averages hide variation.</strong> Within each neighborhood, pockets of extreme vulnerability exist. 
-                    Block-by-block variation is much higher.
-                </li>
-                <li>
-                    <strong>We assume people don't adapt.</strong> In reality, some will buy A/C, move, or build community support. 
-                    Our projections are conservative.
-                </li>
-                <li>
-                    <strong>Not all data is equal.</strong> 11,554 neighborhoods included; some neighborhoods lack health data and are estimated.
-                </li>
-                <li>
-                    <strong>Climate projections have uncertainty.</strong> +1.5°C or +3.0°C are ranges, not certainties. 
-                    Real outcomes depend on global decisions right now.
-                </li>
-                <li>
-                    <strong>This is one model.</strong> Use alongside other tools and local expertise. 
-                    The best decisions combine data with community knowledge.
-                </li>
-            </ul>
-        </section>
+        </div>
 
-        <!-- LEARN MORE -->
-        <section style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 40px; border-radius: 10px; margin: 40px 0; text-align: center;">
-            <h2 style="color: white; margin-top: 0;">Questions? Need the full technical details?</h2>
-            <p style="font-size: 1.05em; margin: 15px 0;">This page is designed for understanding the concepts. 
-            For research papers, full model specifications, or technical discussions, contact the development team.</p>
-            <a href="index.html" class="back-button" style="margin-top: 20px; display: inline-block;">← Return to Dashboard</a>
-        </section>
+        <ul class="caveat-list">
+            <li>
+                <span class="caveat-num">C1</span>
+                <div><strong>Neighbourhood averages hide internal variation.</strong> Within each boundary, pockets of extreme vulnerability exist. Block-by-block risk can be far higher than the neighbourhood score suggests.</div>
+            </li>
+            <li>
+                <span class="caveat-num">C2</span>
+                <div><strong>We assume no behavioural adaptation.</strong> In reality, residents will buy air conditioning, relocate, or build mutual support networks. Our projections are deliberately conservative.</div>
+            </li>
+            <li>
+                <span class="caveat-num">C3</span>
+                <div><strong>Health data gaps exist.</strong> 11,554 of 14,668 neighbourhoods have complete health data; the remainder are estimated. Edge areas may be less reliable.</div>
+            </li>
+            <li>
+                <span class="caveat-num">C4</span>
+                <div><strong>Climate projections carry inherent uncertainty.</strong> +1.5°C and +3.0°C are scenario midpoints, not certainties. Real outcomes depend on global emissions decisions made today.</div>
+            </li>
+            <li>
+                <span class="caveat-num">C5</span>
+                <div><strong>This is one model among many.</strong> Use alongside other tools, local knowledge, and community input. The best interventions combine data with ground-truth expertise.</div>
+            </li>
+            <li>
+                <span class="caveat-num">C6</span>
+                <div><strong>Social factors remain partially unmeasured.</strong> Community cohesion, access to services, migration patterns, and informal support networks are not directly captured in any of the three datasets.</div>
+            </li>
+        </ul>
+    </section>
+
+    <div class="footer-cta">
+        <h2>Ready to explore the <em>map</em>?</h2>
+        <a href="index.html" class="cta-btn">← Back to Dashboard</a>
     </div>
-    
-    <footer>
-        <p style="margin-bottom: 15px;">
-            <strong>Heat Vulnerability Tool</strong><br>
-            Developed for the Dutch Ministry of Health
-        </p>
-        <p style="font-size: 0.9em; color: #aaa;">
-            Data sources: CBS 2024 · GGD 2024 · KlimaatAtlas 2024<br>
-            Climate projections: KNMI (Royal Netherlands Meteorological Institute)
-        </p>
-    </footer>
-</body>
-</html>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Dataset</th>
-                        <th>Source</th>
-                        <th>What It Provides</th>
-                        <th>Neighborhoods</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Climate Data</strong></td>
-                        <td>KlimaatAtlas 2024</td>
-                        <td>PET (Perceived Temperature) in °C at neighborhood level</td>
-                        <td>14,668</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Demographics</strong></td>
-                        <td>CBS (Centraal Bureau voor Statistiek)</td>
-                        <td>Age, income, housing type, population</td>
-                        <td>14,668</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Health Indicators</strong></td>
-                        <td>GGD (Municipal Health Services)</td>
-                        <td>Self-reported good health, stress, loneliness, heat coping ability</td>
-                        <td>11,554*</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p style="font-size: 12px; color: #7f8c8d;">*Only neighborhoods with complete health data were included in model training</p>
-        </section>
 
-        <!-- THE MODEL -->
-        <section id="model" class="section">
-            <h2>The Machine Learning Model</h2>
-            
-            <h3>Model Type: Multiple Linear Regression</h3>
-            <p>
-                We use <strong>Linear Regression</strong> because:
-            </p>
-            <ul>
-                <li><strong>Interpretability:</strong> Easy to explain to policymakers</li>
-                <li><strong>Transparency:</strong> Each factor's impact is clearly visible</li>
-                <li><strong>Validated:</strong> Well-established statistical method</li>
-            </ul>
-            
-            <h3>Training Data</h3>
-            <ul>
-                <li>Neighborhoods trained on: <strong>11,554</strong></li>
-                <li>Data year: <strong>2024</strong></li>
-                <li>Geographic coverage: <strong>All Dutch neighborhoods with health data</strong></li>
-            </ul>
-            
-            <h3>The Formula</h3>
-            <div class="formula">
-Health Vulnerability (raw) = -1047.90 
-                           + 4.46 × PET_temperature
-                           + 3.25 × Percentage_Low_Income
-                           + 1.43 × Percentage_Elderly  
-                           + 1.40 × Percentage_Rental_Housing
-            </div>
-            
-            <h3>Example Calculation</h3>
-            <div class="highlight">
-                <strong>Amsterdam Neighborhood (hypothetical):</strong>
-                <ul style="margin: 10px 0;">
-                    <li>PET = 44°C</li>
-                    <li>Low-income residents = 25%</li>
-                    <li>Elderly (65+) = 15%</li>
-                    <li>Rental housing = 60%</li>
-                </ul>
-                <strong>Calculation:</strong><br>
-                -1047.90 + 4.46(44) + 3.25(25) + 1.43(15) + 1.40(60)<br>
-                = -1047.90 + 196.24 + 81.25 + 21.45 + 84.00<br>
-                = <strong>-665.0 (raw score)</strong>
-                <br><br>
-                <strong>After normalization to 0-100:</strong> ~35/100 (Moderate Risk)
-            </div>
-            
-            <h3>Normalization</h3>
-            <p>
-                Raw model outputs range from -803 to -334. To make them interpretable, all scores are normalized to a 0-100 scale:
-            </p>
-            <div class="formula">
-Normalized Score = 100 × (Raw Score - Minimum) / (Maximum - Minimum)
-            </div>
-            <p>
-                This ensures <strong>0 = lowest risk</strong> and <strong>100 = highest risk</strong> consistent across all scenarios.
-            </p>
-        </section>
+</div>
 
-        <!-- FEATURES -->
-        <section id="features" class="section">
-            <h2>📈 Model Features & Their Impact</h2>
-            
-            <p>Each factor contributes to the overall vulnerability score. Higher coefficients mean stronger impact.</p>
-            
-            <div class="feature-card">
-                <h3>PET Temperature (Coefficient: +4.46) <strong style="color:#bd0026;">HIGHEST IMPACT</strong></h3>
-                <p>
-                    <strong>What it measures:</strong> Perceived Temperature in °C - how hot it feels INCLUDING wind, humidity, and radiation<br>
-                    <strong>Impact:</strong> Every 1°C increase = +4.46 points vulnerability<br>
-                    <strong>Range:</strong> 35°C to 50°C across Netherlands<br>
-                    <strong>Why it matters:</strong> Direct measure of heat stress on the body
-                </p>
-            </div>
-            
-            <div class="feature-card">
-                <h3>Low-Income Population (Coefficient: +3.25) <strong style="color:#f03b20;">2nd HIGHEST</strong></h3>
-                <p>
-                    <strong>What it measures:</strong> Percentage of residents in bottom 40% income distribution<br>
-                    <strong>Impact:</strong> Every +1% low-income = +3.25 points vulnerability<br>
-                    <strong>Range:</strong> 7% to 95% across neighborhoods<br>
-                    <strong>Why it matters:</strong> Lower ability to afford air conditioning, healthcare, or cool places to escape
-                </p>
-            </div>
-            
-            <div class="feature-card">
-                <h3>👴 Elderly Population (Coefficient: +1.43)</h3>
-                <p>
-                    <strong>What it measures:</strong> Percentage of residents 65 years or older<br>
-                    <strong>Impact:</strong> Every +1% elderly = +1.43 points vulnerability<br>
-                    <strong>Range:</strong> 0% to 100% (some neighborhoods no elderly, others majority)<br>
-                    <strong>Why it matters:</strong> Elderly have reduced ability to thermoregulate; more health conditions
-                </p>
-            </div>
-            
-            <div class="feature-card">
-                <h3>Rental Housing (Coefficient: +1.40)</h3>
-                <p>
-                    <strong>What it measures:</strong> Percentage of rented (not owner-occupied) homes<br>
-                    <strong>Impact:</strong> Every +1% rental = +1.40 points vulnerability<br>
-                    <strong>Range:</strong> 0% to 100%<br>
-                    <strong>Why it matters:</strong> Renters often occupy older buildings with poor insulation; less control over renovations
-                </p>
-            </div>
-        </section>
+<footer>
+    <p>
+        <strong>Heat Vulnerability Tool</strong> · Developed for the Dutch Ministry of Health<br>
+        Data: CBS 2024 · GGD 2024 · KlimaatAtlas 2024 · Climate projections: KNMI
+    </p>
+</footer>
 
-        <!-- COLOR SCALE -->
-        <section id="colors" class="section">
-            <h2>Color Scale & Risk Interpretation</h2>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Color</th>
-                        <th>Score Range</th>
-                        <th>Risk Level</th>
-                        <th>Interpretation</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><span class="color-demo" style="background:#ffffb2;"></span> Light Yellow</td>
-                        <td>0-20</td>
-                        <td>Safe</td>
-                        <td>Low heat vulnerability; good coping capacity</td>
-                    </tr>
-                    <tr>
-                        <td><span class="color-demo" style="background:#fecc5c;"></span> Yellow</td>
-                        <td>20-40</td>
-                        <td>Low</td>
-                        <td>Some vulnerability factors present</td>
-                    </tr>
-                    <tr>
-                        <td><span class="color-demo" style="background:#fd8d3c;"></span> Orange</td>
-                        <td>40-60</td>
-                        <td>Moderate</td>
-                        <td>Significant vulnerability; intervention needed</td>
-                    </tr>
-                    <tr>
-                        <td><span class="color-demo" style="background:#f03b20;"></span> Red</td>
-                        <td>60-80</td>
-                        <td>High</td>
-                        <td>High vulnerability; urgent support needed</td>
-                    </tr>
-                    <tr>
-                        <td><span class="color-demo" style="background:#bd0026;"></span> Dark Red</td>
-                        <td>80-100</td>
-                        <td>Critical</td>
-                        <td>Extreme vulnerability; immediate action required</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <!-- SCENARIOS -->
-        <section id="scenarios" class="section">
-            <h2>Future Scenarios & Policy Interventions</h2>
-            
-            <h3>Climate Scenarios</h3>
-            <p>Based on KNMI (Royal Netherlands Meteorological Institute) climate projections:</p>
-            
-            <div class="feature-card">
-                <h4>2025: Current Baseline</h4>
-                <p>
-                    <strong>Temperature change:</strong> 0°C (current conditions)<br>
-                    <strong>Uses:</strong> Real 2024 neighborhood data<br>
-                    <strong>Purpose:</strong> Establish present-day risk
-                </p>
-            </div>
-            
-            <div class="feature-card">
-                <h4>2050: +1.5°C Warming</h4>
-                <p>
-                    <strong>Temperature change:</strong> +1.5°C added to PET values<br>
-                    <strong>KNMI scenario:</strong> Paris Agreement (low emissions) trajectory<br>
-                    <strong>Effect:</strong> Average vulnerability increase ~8 points
-                </p>
-            </div>
-            
-            <div class="feature-card">
-                <h4>2075: +3.0°C Warming</h4>
-                <p>
-                    <strong>Temperature change:</strong> +3.0°C added to PET values<br>
-                    <strong>KNMI scenario:</strong> Current emissions trajectory<br>
-                    <strong>Effect:</strong> Average vulnerability increase ~16 points
-                </p>
-            </div>
-            
-            <h3>Policy Intervention</h3>
-            
-            <div class="feature-card">
-                <h4>🌿 2050 + Urban Greening Policy</h4>
-                <p>
-                    <strong>What it simulates:</strong> Adding 15% green space to all neighborhoods<br>
-                    <strong>How it's modeled:</strong> Reduces rental housing coefficient by 15 percentage points<br>
-                    <strong>Rationale:</strong> Green space improves building insulation, provides cooling refuges, indicates neighborhood investment<br>
-                    <strong>Result:</strong> ~9-10 point reduction in average vulnerability vs. 2050 baseline
-                </p>
-            </div>
-        </section>
-
-        <!-- LIMITATIONS -->
-        <section id="limitations" class="section">
-            <h2>Model Limitations & Assumptions</h2>
-            
-            <ul>
-                <li><strong>Cross-sectional design:</strong> Model trained on 2024 data; assumes relationships don't change dramatically</li>
-                <li><strong>Neighborhood aggregation:</strong> Vulnerability masks variation within neighborhoods (e.g., poorer blocks vs. wealthy blocks)</li>
-                <li><strong>Health data gaps:</strong> Only 11,554 of 14,668 neighborhoods have health data; missing areas interpolated</li>
-                <li><strong>PET measurement:</strong> Based on KlimaatAtlas grid; local microclimates not captured</li>
-                <li><strong>Linear model assumption:</strong> Assumes linear relationships between features and vulnerability (may not capture complex interactions)</li>
-                <li><strong>Future projections:</strong> Assumes no behavioral changes (e.g., people don't necessarily move, invest in cooling, etc.)</li>
-                <li><strong>Social factors unmeasured:</strong> Community cohesion, access to services, migration patterns not directly in model</li>
-            </ul>
-        </section>
-
-        <!-- HOW TO USE -->
-        <section id="howto" class="section">
-            <h2>How to Use the Dashboard</h2>
-            
-            <ol>
-                <li><strong>Open the main dashboard</strong> (index.html)</li>
-                <li><strong>Select a climate scenario</strong> using the buttons on the left sidebar</li>
-                <li><strong>Click on any neighborhood</strong> to see its:
-                    <ul>
-                        <li>Name</li>
-                        <li>Current risk score (0-100)</li>
-                        <li>Color-coded vulnerability level</li>
-                    </ul>
-                </li>
-                <li><strong>Compare scenarios</strong> by switching between 2025, 2050, 2075, and the greening policy</li>
-                <li><strong>Identify hotspots</strong> (red and dark red areas) for priority intervention</li>
-                <li><strong>Assess policy impact</strong> by comparing 2050 baseline vs. 2050 + greening</li>
-            </ol>
-        </section>
-
-        <!-- KEY INSIGHTS -->
-        <section id="insights" class="section">
-            <h2>Key Insights</h2>
-            
-            <ul>
-                <li><strong>Temperature is dominant:</strong> Heat stress (+4.46) is the strongest predictor, roughly 40% more impactful than income</li>
-                <li><strong>Inequality matters:</strong> Low-income and rental housing together account for ~45% of model weight</li>
-                <li><strong>Aging compounds risk:</strong> While elderly population affects only ~10% of total variation, it's an independent vulnerability factor</li>
-                <li><strong>Urban-rural divide:</strong> Cities typically show higher rental %, while rural areas have more elderly—creating different risk profiles</li>
-                <li><strong>Policy works:</strong> Urban greening reduces vulnerability by ~10 points—comparable to delaying warming by ~2-3 years</li>
-                <li><strong>Existing disparities grow:</strong> High-vulnerability areas get worse with warming; low-vulnerability areas relatively stable</li>
-            </ul>
-        </section>
-
-        <!-- METHODOLOGY REFERENCE -->
-        <section id="methodology" class="section">
-            <h2>Technical Reference</h2>
-            
-            <h3>Model Statistics</h3>
-            <ul>
-                <li><strong>Training samples:</strong> 11,554 neighborhoods</li>
-                <li><strong>Target variable:</strong> Inverted good health perception (0-100 scale)</li>
-                <li><strong>Input features:</strong> 4 (PET, low-income %, elderly %, rental %)</li>
-                <li><strong>Model type:</strong> Scikit-learn LinearRegression</li>
-                <li><strong>No regularization:</strong> Raw linear model; emphasis on interpretability</li>
-            </ul>
-            
-            <h3>Data Processing</h3>
-            <div class="code-block">
-# Load data from multiple sources
-health_data (GGD 2024) + CBS_data (demographics) + climate_data (KlimaatAtlas)
-
-# Filter to neighborhoods with complete data
-neighborhoods = health_data ∩ CBS_data ∩ climate_data  # 11,554 neighborhoods
-
-# Handle missing values
-drop rows with NaN in key features
-
-# Scale target
-target = 100 - good_health_perception  # invert to measure vulnerability
-
-# Normalize predictions to 0-100
-normalized_score = 100 * (raw_prediction - min) / (max - min)
-
-# Generate future scenarios
-climate_2050 = features + [PET += 1.5]
-climate_2075 = features + [PET += 3.0]
-policy_2050 = climate_2050 + [rental % -= 15]
-            </div>
-        </section>
-
-        <!-- FOOTER -->
-        <footer>
-            <p>
-                <strong>Climate Exposure Health Tool</strong> | Developed for the Dutch Ministry of Health<br>
-                Data sources: CBS 2024, GGD 2024, KlimaatAtlas 2024<br>
-                Climate projections: KNMI (Royal Netherlands Meteorological Institute)<br>
-                <a href="index.html" style="color: #3498db; text-decoration: none;">↩ Return to Dashboard</a>
-            </p>
-        </footer>
-    </div>
 </body>
 </html>
