@@ -38,11 +38,11 @@
             <a href="explain.html" style="font-size: 15px; color: white; text-decoration: none; font-weight: 600; display: inline-block;">📖 Learn How It Works</a>
         </div>
         
-        <h1>🇳🇱 Climate Exposure Health Tool</h1>
+        <h1>Climate Exposure Health Tool</h1>
         <p class="subtitle">Predicting neighborhood-level health vulnerability to extreme heat up to 2075. Developed in partnership with the Ministry of Health.</p>
 
         <div class="control-group">
-            <label><strong>📊 What's Being Displayed?</strong></label>
+            <label><strong>What's Being Displayed?</strong></label>
             <p style="font-size:12px; color:#555; line-height:1.4; margin:0;">
                 <strong>Health Vulnerability Score (0-100):</strong> Higher = greater risk. Combines seven factors:
                 <ul style="margin:5px 0; padding-left:20px; font-size:11px;">
@@ -52,7 +52,6 @@
                     <li><strong>Children (+2.89)</strong>: % aged 0-14</li>
                     <li><strong>Old Buildings (+0.66)</strong>: % built before 2010</li>
                     <li><strong>Stress (+0.66)</strong>: High stress index</li>
-                    <li><strong>Housing (+0.61)</strong>: % rental units</li>
                 </ul>
             </p>
         </div>
@@ -73,7 +72,7 @@
         </div>
 
         <div class="control-group" style="background:#f0f8ff; padding:10px; border-radius:5px; margin-top:15px;">
-            <label style="color:#0066cc;">📐 The Math Behind the Model</label>
+            <label style="color:#0066cc;"> The Math Behind the Model</label>
             <p style="font-size:11px; color:#333; line-height:1.5; margin:0;">
                 <strong>Linear Regression Model:</strong> Trained on 11,554 neighborhoods<br>
                 <code style="background:#eee; padding:2px 4px; font-size:10px;">Vulnerability = -1047.90 + 4.46×Heat + 3.25×Income% + 1.43×Elderly% + 1.40×Rental%</code>
@@ -144,7 +143,7 @@
             .then(response => response.json())
             .then(data => {
                 geojsonData = data;
-                console.log('✅ GeoJSON loaded! Features:', data.features.length);
+                console.log('GeoJSON loaded! Features:', data.features.length);
                 console.log('Sample feature properties:', data.features[0]?.properties);
                 
                 geojsonLayer = L.geoJson(data, { 
@@ -155,11 +154,11 @@
                 // Update debug info
                 var validCount = data.features.filter(f => f.properties[currentScenario]).length;
                 document.getElementById('debug-info').innerHTML = 
-                    '✅ Loaded ' + validCount + ' neighborhoods | Model: 11,554 trained';
+                    'Loaded ' + validCount + ' neighborhoods | Model: 11,554 trained';
             })
             .catch(error => {
-                console.error('❌ Error loading GeoJSON:', error);
-                document.getElementById('debug-info').innerHTML = '❌ Error loading map data';
+                console.error('Error loading GeoJSON:', error);
+                document.getElementById('debug-info').innerHTML = 'Error loading map data';
             });
 
         // 4. Handle Button Clicks (FIXED)
@@ -186,7 +185,7 @@
                         style: style,
                         onEachFeature: onEachFeature
                     }).addTo(map);
-                    console.log('✅ Map redrawn with', currentScenario);
+                    console.log('Map redrawn with', currentScenario);
                 }
             });
         });
@@ -207,7 +206,7 @@
         };
         legend.addTo(map);
         
-        console.log('🚀 Dashboard initialized!');
+        console.log('Dashboard initialized!');
     </script>
 </body>
 </html>
