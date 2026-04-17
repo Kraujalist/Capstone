@@ -262,16 +262,16 @@
         var geojsonData;
         var currentScenario = 'risk_2025_baseline';
 
-        // Color Scale matching the "Risk Levels" section of how-it-works.html
+// Updated Color Scale matching the RAW Risk Levels (-800 to -360)
         function getColor(score) {
             if (!score || isNaN(score)) return '#e8e2d9'; 
-            return score > 80 ? '#bd0026' : // Critical
-                   score > 60 ? '#f03b20' : // High
-                   score > 40 ? '#fd8d3c' : // Moderate
-                   score > 20 ? '#fecc5c' : // Low
-                                '#ffffb2';  // Safe
+            return score > -450 ? '#bd0026' : // Critical (Max is ~ -362)
+                   score > -550 ? '#f03b20' : // High
+                   score > -650 ? '#fd8d3c' : // Moderate (Avg is ~ -645)
+                   score > -750 ? '#fecc5c' : // Low
+                                  '#ffffb2';  // Safe (Min is ~ -799)
         }
-
+        
         function style(feature) {
             var score = feature.properties[currentScenario];
             return {
@@ -283,7 +283,7 @@
             };
         }
 
-        function onEachFeature(feature, layer) {
+       function onEachFeature(feature, layer) {
             var name = feature.properties.buurtnaam || "Neighborhood"; 
             
             layer.bindPopup(function() {
@@ -292,7 +292,8 @@
                 return "<div style='font-family: \"DM Mono\", monospace; font-size: 12px;'>" +
                        "<b style='font-family: \"DM Serif Display\"; font-size: 16px;'>" + name + "</b><br>" + 
                        "<div style='margin-top:8px; border-top:1px solid rgba(250,248,245,0.2); padding-top:8px;'>" +
-                       "RISK SCORE: <span style='color:#f4a261; font-size: 18px;'>" + displayScore + "</span> / 100" +
+                       // REMOVED the " / 100" text here:
+                       "RAW RISK SCORE: <span style='color:#f4a261; font-size: 18px;'>" + displayScore + "</span>" +
                        "</div></div>";
             });
             
@@ -336,11 +337,13 @@
         });
 
         // Legend
+      // Updated Legend
         var legend = L.control({position: 'bottomright'});
         legend.onAdd = function (map) {
             var div = L.DomUtil.create('div', 'info legend'),
-                grades = [0, 20, 40, 60, 80];
-            div.innerHTML += '<strong>Vulnerability</strong>';
+                // Updated array to match your new getColor thresholds
+                grades = [-850, -750, -650, -550, -450]; 
+            div.innerHTML += '<strong>Raw Vulnerability</strong>';
             for (var i = 0; i < grades.length; i++) {
                 div.innerHTML +=
                     '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
