@@ -41,6 +41,35 @@
     .nav-btn{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;background:var(--ink);color:var(--paper);text-decoration:none;padding:8px 16px;border-radius:2px;transition:.2s}
     .nav-btn:hover{background:var(--accent)}
 
+    /* --- NEW PROFESSIONAL ANIMATIONS --- */
+@keyframes slideUpFade {
+    0% { opacity: 0; transform: translateY(15px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.prov-btn, .muni-card, .rank-row {
+    /* Apply the slide-up animation */
+    animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0; /* Ensures they are invisible before the animation triggers */
+}
+
+/* Enhanced hover states for a more tactile, professional feel */
+.muni-card:hover, .prov-btn:hover {
+    border-color: var(--accent);
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(26, 20, 16, 0.06);
+    transform: translateY(-2px);
+    transition: all 0.25s ease;
+    z-index: 10;
+}
+
+/* Optional: Slight pop on the badges when hovering over a card */
+.mc-badge {
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.muni-card:hover .mc-badge {
+    transform: scale(1.08);
+}
     /* ── HERO ── */
     #hero{
         min-height:100vh;padding:100px 32px 64px;
@@ -670,7 +699,7 @@ function renderMuniList() {
         list.innerHTML = `<p style="grid-column:span 2;font-family:var(--mono);font-size:.7rem;color:var(--light);padding:16px 0">No neighborhood data found for this province in the current dataset.</p>`;
     }
     
-    rankings.slice(0, 10).forEach((gm, i) => {
+    rankings.forEach((gm, i) => {
         const worst = worstThemes(gm, 2);
         const displayScore = currentMuniSortTheme === 'composite' ? gm.avgRisk : gm.themes[currentMuniSortTheme];
         
@@ -684,6 +713,7 @@ function renderMuniList() {
             </div>
             <span class="mc-score">${Math.round(displayScore)}</span>`;
         card.addEventListener('click', () => selectMuni(gm.name));
+        card.style.animationDelay = `${Math.min(i * 0.03, 0.6)}s`;
         list.appendChild(card);
     });
 }
@@ -803,7 +833,6 @@ function buildRankings(feats, theme) {
     const sorted = feats
         .filter(f => f.properties[theme.key] != null)
         .sort((a,b) => b.properties[theme.key] - a.properties[theme.key])
-        .slice(0, 10);
 
     const list = document.getElementById('rankList');
     list.innerHTML = `<div style="font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--light);margin-bottom:8px">Worst neighborhoods — ${theme.label}</div>`;
@@ -812,6 +841,7 @@ function buildRankings(feats, theme) {
         const row = document.createElement('div');
         row.className = 'rank-row';
         row.innerHTML = `<span class="r-pos">${i+1}</span><span class="r-name">${f.properties.buurtnaam||'—'}</span><div class="r-bar"><div class="r-fill" style="width:${s}%;background:${theme.color}"></div></div><span class="r-val">${s}</span>`;
+        row.style.animationDelay = `${Math.min(i * 0.02, 0.5)}s`;
         list.appendChild(row);
     });
 }
